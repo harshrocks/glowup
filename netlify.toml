@@ -1,0 +1,13 @@
+# Netlify configuration file for routing frontend API requests to the Express backend
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-backend-server-url.com/api/:splat"
+  status = 200
+  force = true
+
+# Fallback rule for React Router Single Page Application (SPA) routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
