@@ -28,9 +28,10 @@ import PointCircle from './components/PointCircle';
 import TaskGrid from './components/TaskGrid';
 import SocialHub from './components/SocialHub';
 import ProfileAnalytics from './components/ProfileAnalytics';
-import SimulationControls from './components/SimulationControls';
 import AuthScreen from './components/AuthScreen';
-import { playCuteClick, playCuteSuccess, playCuteVictory } from './utils/audio';
+import LandingPage from './components/LandingPage';
+import { playCuteClick, playCuteSuccess, playCuteVictory, playYaySound } from './utils/audio';
+import { triggerConfetti } from './utils/confetti';
 
 // Streak calculator algorithm
 function computeStreak(logs: DailyLog[], referenceDateStr: string): { current: number; best: number } {
@@ -136,6 +137,8 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState<boolean>(true);
+  const [showAuthScreen, setShowAuthScreen] = useState<boolean>(false);
+  const [lastLogTime, setLastLogTime] = useState<number>(0);
 
   // Authenticate session on bootup
   useEffect(() => {
@@ -216,6 +219,12 @@ export default function App() {
   useEffect(() => {
     if (isAuthenticated && currentUser) {
       fetchDbRecords();
+
+      const interval = setInterval(() => {
+        fetchDbRecords();
+      }, 5000);
+
+      return () => clearInterval(interval);
     }
   }, [isAuthenticated, currentUser, currentDate]);
 
@@ -331,11 +340,23 @@ export default function App() {
 
   // Task Grid Event: Toggle standard binary tasks
   const handleToggleTask = (taskId: string) => {
+    const isCompleting = !currentDayLog.completedTaskIds.includes(taskId);
+    if (isCompleting) {
+      const now = Date.now();
+      if (now - lastLogTime < 8000) {
+        showNotificationToast(
+          '🔒 Focus Protection Active',
+          'Deep work takes time! Please wait at least 8 seconds between completing tasks to prevent rapid-fire logging.'
+        );
+        return;
+      }
+      setLastLogTime(now);
+    }
+
     const log = { ...currentDayLog };
     const taskObj = GLOWUP_TASKS.find(t => t.id === taskId);
     const toggledName = taskObj ? taskObj.name : undefined;
     
-    const wasToggledOn = !log.completedTaskIds.includes(taskId);
     // Toggle
     if (log.completedTaskIds.includes(taskId)) {
       log.completedTaskIds = log.completedTaskIds.filter(id => id !== taskId);
@@ -350,6 +371,8 @@ export default function App() {
     if (log.pointsEarned >= 10 && currentDayLog.pointsEarned < 10) {
       showNotificationToast('🌟 10-Point Glow Up Reached!', `Congratulations, you've unlocked today's intellectual growth score. Streak continues!`);
       playCuteVictory();
+      playYaySound();
+      triggerConfetti();
     } else if (log.pointsEarned > currentDayLog.pointsEarned) {
       playCuteSuccess();
     } else {
@@ -371,6 +394,16 @@ export default function App() {
     let toggledName: string | undefined = undefined;
 
     if (isNowCompleted && !wasCompleted) {
+      const now = Date.now();
+      if (now - lastLogTime < 8000) {
+        showNotificationToast(
+          '🔒 Focus Protection Active',
+          'Deep work takes time! Please wait at least 8 seconds before completing another task.'
+        );
+        return;
+      }
+      setLastLogTime(now);
+
       log.completedTaskIds.push('writing');
       toggledName = 'Essays & Journaling';
       showNotificationToast('✍️ Journaling Achievement!', 'Completed 200+ words! Hitting academic standards.');
@@ -383,6 +416,8 @@ export default function App() {
     if (log.pointsEarned >= 10 && currentDayLog.pointsEarned < 10) {
       showNotificationToast('🌟 10-Point Glow Up Reached!', `Congratulations! Hitting daily point benchmarks.`);
       playCuteVictory();
+      playYaySound();
+      triggerConfetti();
     } else if (isNowCompleted && !wasCompleted) {
       playCuteSuccess();
     }
@@ -610,13 +645,29 @@ export default function App() {
   }
 
   if (!isAuthenticated || !currentUser) {
+    if (showAuthScreen) {
+      return (
+        <div className="relative">
+          {/* Back button overlay */}
+          <button 
+            onClick={() => setShowAuthScreen(false)}
+            className="absolute top-6 left-6 z-50 px-3.5 py-1.5 rounded-xl border border-zinc-250 dark:border-zinc-800 text-xs font-semibold bg-white/90 dark:bg-zinc-950/90 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all shadow-sm cursor-pointer select-none"
+          >
+            ← Back to Home
+          </button>
+          <AuthScreen
+            onAuthSuccess={(t, u) => {
+              setToken(t);
+              setCurrentUser(u);
+              setIsAuthenticated(true);
+            }}
+          />
+        </div>
+      );
+    }
     return (
-      <AuthScreen
-        onAuthSuccess={(t, u) => {
-          setToken(t);
-          setCurrentUser(u);
-          setIsAuthenticated(true);
-        }}
+      <LandingPage 
+        onEnterApp={() => setShowAuthScreen(true)} 
       />
     );
   }
@@ -656,7 +707,7 @@ export default function App() {
 
       {/* Elegant minimalist header - compact & mobile optimized */}
       <header className="sticky top-0 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-md border-b border-zinc-200/55 dark:border-zinc-800/50 z-30 px-4 py-3 sm:px-6 sm:py-4 select-none transition-all">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-5 h-5 sm:w-6 sm:h-6 bg-indigo-500 rounded-full blur-[2px] opacity-85 shadow-[0_0_15px_rgba(99,102,241,0.6)]"></div>
             <div>
@@ -682,7 +733,7 @@ export default function App() {
       </header>
 
       {/* Primary body view wrapper - scrolling happens smooth inside main panel within full-screen viewport */}
-      <main className="flex-1 overflow-y-auto w-full max-w-4xl mx-auto px-4 py-4 sm:py-6 pb-6 sm:pb-8 scroll-smooth select-text">
+      <main className="flex-1 overflow-y-auto w-full max-w-6xl mx-auto px-4 py-4 sm:py-6 pb-28 scroll-smooth select-text">
         <AnimatePresence mode="wait">
           {activeTab === 'dashboard' && (
             <motion.div
@@ -758,7 +809,7 @@ export default function App() {
       </main>
 
       {/* Premium native bottom navigation bar for iOS & Android Feel (Stationary & Sticky at the bottom) */}
-      <div className="w-full max-w-sm mx-auto px-4 pb-6 pt-2 z-40 select-none pb-safe">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-sm px-4 z-40 select-none">
         <div className="bg-white/80 dark:bg-[#0c0c0e]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-zinc-800/80 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.3)] p-1.5 rounded-2xl">
           <div className="grid grid-cols-3 gap-1">
             <button
@@ -799,15 +850,6 @@ export default function App() {
           </div>
         </div>
       </div>
-
-      {/* Floating Developer Sandbox controls */}
-      <SimulationControls
-        currentDate={currentDate}
-        onSetDate={setCurrentDate}
-        onSimulateFriendActivity={handleSimulateFriendActivity}
-        onTriggerRandomNudge={handleTriggerRandomNudge}
-        onHardReset={handleHardReset}
-      />
     </div>
   );
 }

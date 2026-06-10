@@ -130,3 +130,19 @@ export function playCuteVictory() {
     console.warn('Audio victory playback suppressed or unavailable:', err);
   }
 }
+
+/**
+ * Play the custom celebratory yay.mp3 sound when goal is complete
+ */
+export function playYaySound() {
+  try {
+    const audio = new Audio('/yay.mp3');
+    audio.volume = 0.4;
+    audio.play().catch(err => {
+      console.warn('Audio playback suppressed or blocked:', err);
+    });
+  } catch (err) {
+    console.warn('Audio element play failed:', err);
+  }
+}
+

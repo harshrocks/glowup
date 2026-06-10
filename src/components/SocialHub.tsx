@@ -191,7 +191,6 @@ export default function SocialHub({
       {/* Grid: Leaderboard & Recent Social Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Dynamic Leaderboard */}
         <div id="leaderboard-panel" className="lg:col-span-7 bg-zinc-50/20 dark:bg-zinc-900/40 p-6 rounded-3xl border border-zinc-250 dark:border-zinc-850 shadow-xs space-y-5">
           <div className="flex items-center justify-between">
             <div>
@@ -202,7 +201,7 @@ export default function SocialHub({
                 Compare today's point totals. Resetting at midnight.
               </p>
             </div>
-            <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 px-2.5 py-0.5 rounded bg-zinc-100/80 dark:bg-zinc-90 w-auto select-none border border-zinc-200 dark:border-zinc-800">
+            <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 px-2.5 py-0.5 rounded bg-zinc-100/80 dark:bg-zinc-900 w-auto select-none border border-zinc-200 dark:border-zinc-800">
               Ranked Live
             </span>
           </div>
@@ -222,15 +221,15 @@ export default function SocialHub({
                       : 'bg-zinc-50/50 dark:bg-zinc-900/60 border-zinc-200/60 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     {/* Position circle */}
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold leading-none ${idx === 0 ? 'bg-amber-500/10 text-amber-505 border border-amber-500/30' : idx === 1 ? 'bg-indigo-500/10 text-indigo-505 border border-indigo-500/30' : 'bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-405'}`}>
+                    <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold leading-none ${idx === 0 ? 'bg-amber-500/10 text-amber-500 border border-amber-500/30' : idx === 1 ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/30' : 'bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-400'}`}>
                       {idx + 1}
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       {/* Avatar with crown overlay */}
-                      <div className="relative">
+                      <div className="relative flex-shrink-0">
                         <img
                           src={user.avatarUrl}
                           alt={user.displayName}
@@ -244,9 +243,9 @@ export default function SocialHub({
                       </div>
 
                       {/* Identification and Status */}
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-baseline gap-1.5">
-                          <span className={`text-sm font-semibold truncate ${isMe ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-800 dark:text-zinc-100'}`}>
+                          <span className={`text-sm font-semibold truncate block ${isMe ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-800 dark:text-zinc-100'}`}>
                             {isMe ? 'You' : user.displayName}
                           </span>
                         </div>
@@ -261,9 +260,9 @@ export default function SocialHub({
                   </div>
 
                   {/* Points and Quick Nudge action */}
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 flex-shrink-0 ml-3">
                     <div className="flex flex-col items-end">
-                      <span className={`text-xs font-bold font-mono ${hasGlowed ? 'text-amber-550' : 'text-zinc-805 dark:text-zinc-200'}`}>
+                      <span className={`text-xs font-bold font-mono ${hasGlowed ? 'text-amber-500' : 'text-zinc-800 dark:text-zinc-250'}`}>
                         {user.todayPoints < 10 ? `0${user.todayPoints}` : user.todayPoints} pts
                       </span>
                       <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-mono mt-0.5">
@@ -279,7 +278,7 @@ export default function SocialHub({
                           const originalFriend = friends.find(f => f.username === user.username);
                           if (originalFriend) setSelectedFriendNudge(originalFriend);
                         }}
-                        className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium uppercase tracking-widest transition-colors select-none text-zinc-800 dark:text-zinc-350"
+                        className="px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium uppercase tracking-widest transition-colors select-none text-zinc-805 dark:text-zinc-300"
                       >
                         Nudge
                       </button>
@@ -305,7 +304,7 @@ export default function SocialHub({
             </p>
           </div>
 
-          <div className="space-y-4 overflow-y-auto max-h-[280px] pr-1">
+          <div className="space-y-4 pr-1">
             {activities.length === 0 ? (
               <div className="text-center py-8 text-xs text-zinc-500">
                 No recent activity. Push hard and encourage others!
