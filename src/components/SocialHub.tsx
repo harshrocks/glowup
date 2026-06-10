@@ -57,7 +57,7 @@ export default function SocialHub({
     {
       username: currentUser?.username || 'you',
       displayName: currentUser?.displayName || 'You (GlowUp Master)',
-      avatarUrl: currentUser?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+      avatarUrl: currentUser?.avatarUrl || 'https://api.dicebear.com/7.x/open-peeps/svg?seed=You',
       streak: currentUserStreak,
       todayPoints: currentUserPoints,
       isCurrentUser: true,
@@ -431,9 +431,9 @@ export default function SocialHub({
 
               <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1">
                 {[
-                  { name: 'Dr. Clara Watson', user: 'clara_theory', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80', score: 9 },
-                  { name: 'Marcus Aurelius Junior', user: 'philosopher_kid', avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=120&auto=format&fit=crop&q=80', score: 4 },
-                  { name: 'Gavin Sterling', user: 'gavin_deep', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80', score: 1 }
+                  { name: 'Dr. Clara Watson', user: 'clara_theory', avatar: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=Clara', score: 9 },
+                  { name: 'Marcus Aurelius Junior', user: 'philosopher_kid', avatar: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=Marcus', score: 4 },
+                  { name: 'Gavin Sterling', user: 'gavin_deep', avatar: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=Gavin', score: 1 }
                 ].map(item => {
                   const alreadyFriend = friends.some(f => f.username === item.user);
                   return (

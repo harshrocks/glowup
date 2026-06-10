@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
-import { Calendar, Award, Zap, Heart, TrendingUp, BookOpen, BrainCircuit, Edit2, Check, LogOut, Camera, Image, Link, Upload } from 'lucide-react';
+import { Calendar, Award, Zap, Heart, TrendingUp, BookOpen, BrainCircuit, Edit2, Check, LogOut, Camera, Image, Link, Upload, Sparkles } from 'lucide-react';
 import { DailyLog, TaskCategory } from '../types';
 
 interface ProfileAnalyticsProps {
@@ -38,47 +38,25 @@ export default function ProfileAnalytics({
   const [editedBio, setEditedBio] = useState(currentUser?.statusMessage || '');
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const [avatarInput, setAvatarInput] = useState(currentUser?.avatarUrl || '');
-  const [isDragging, setIsDragging] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-
-  const handleFileUpload = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      setUploadError('Only image files (.png, .jpg, .jpeg, .webp, .gif) are supported.');
-      return;
-    }
-    if (file.size > 1.5 * 1024 * 1024) { // 1.5MB max for reasonable base64 speed and postgres storage limits
-      setUploadError('File size is too large. Please select an image under 1.5MB.');
-      return;
-    }
-
-    setUploadError(null);
-    setIsUploading(true);
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      if (onUpdateAvatar) {
-        onUpdateAvatar(result);
-      }
-      setIsUploading(false);
-    };
-    reader.onerror = () => {
-      setUploadError('Failed to read the target image file.');
-      setIsUploading(false);
-    };
-    reader.readAsDataURL(file);
-  };
+  const [customSeed, setCustomSeed] = useState('');
 
   const PRESET_AVATARS = [
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', // Tech Style Accent
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', // Executive Minimalist
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', // Cheerful Glow
-    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', // Electric Indigo Neon
-    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150', // Soft Classic Look
-    'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150', // Dynamic Creative Artist
-    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150', // Artistic Sunset Accent
-    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'  // Clean Standard Blue
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Felix',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Aneka',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Jack',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Sophia',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Mia',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Leo',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Luna',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Oliver',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Zoe',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Charlie',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Milo',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Coco',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Daisy',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Ginger',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Peanut',
+    'https://api.dicebear.com/7.x/open-peeps/svg?seed=Bella'
   ];
 
   const handleSaveBio = () => {
@@ -302,134 +280,100 @@ export default function ProfileAnalytics({
               </div>
               
               <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                Personalize your profile identity. Drag and drop any custom picture, select a file from your device, or choose from our designer presets.
+                Choose one of our premium preset doodle avatars or generate a completely custom doodle by entering a unique seed word!
               </p>
 
-              {/* Intuitive Drag & Drop Area */}
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setIsDragging(true);
-                }}
-                onDragLeave={() => setIsDragging(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setIsDragging(false);
-                  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                    handleFileUpload(e.dataTransfer.files[0]);
-                  }
-                }}
-                onClick={() => document.getElementById('avatar-file-upload-input')?.click()}
-                className={`relative px-4 py-6 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer select-none transition-all ${
-                  isDragging
-                    ? 'border-indigo-500 bg-indigo-500/5 dark:bg-indigo-500/10 scale-[1.01]'
-                    : 'border-zinc-250 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/10 hover:border-indigo-500/40 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30'
-                }`}
-              >
-                <input
-                  id="avatar-file-upload-input"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      handleFileUpload(e.target.files[0]);
-                    }
-                  }}
-                  className="hidden"
-                />
-                
-                {isUploading ? (
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-6 h-6 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
-                    <span className="text-xs font-mono font-bold text-indigo-500 uppercase tracking-widest animate-pulse">
-                      Transforming Image...
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="p-2.5 rounded-full bg-indigo-500/10 text-indigo-550 dark:text-indigo-400">
-                      <Upload className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
-                        Drop your picture here or <span className="text-indigo-550 dark:text-indigo-400 underline decoration-indigo-500/40">browse device</span>
-                      </p>
-                      <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1 font-mono">
-                        PNG, JPG, WEBP, GIF (Max 1.5MB)
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Upload error feedback */}
-              {uploadError && (
-                <div className="p-3 text-xs rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 font-medium">
-                  ⚠️ {uploadError}
+              {/* Section 1: Presets */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-bold">
+                    1. Choose from preloaded cute presets
+                  </span>
                 </div>
-              )}
+                <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
+                  {PRESET_AVATARS.map((url, idx) => {
+                    const isSelected = currentUser.avatarUrl === url;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => handleSelectPreset(url)}
+                        className={`relative aspect-square rounded-full overflow-hidden border-2 transition-all duration-200 outline-none ${
+                          isSelected 
+                            ? 'border-indigo-500 scale-105 shadow-md' 
+                            : 'border-zinc-200 dark:border-zinc-805 hover:border-indigo-500/40 hover:scale-102'
+                        }`}
+                      >
+                        <img 
+                          referrerPolicy="no-referrer"
+                          src={url} 
+                          alt={`Preset option ${idx + 1}`} 
+                          className="w-full h-full object-cover animate-fade-in"
+                        />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center">
+                            <Check className="w-4 h-4 text-white drop-shadow-md stroke-[3px]" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
               <div className="flex items-center gap-2 pt-1">
                 <div className="h-px bg-zinc-200/60 dark:bg-zinc-900 flex-1" />
-                <span className="text-[9px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
-                  Or select a premium preset
+                <span className="text-[9px] font-mono text-zinc-450 dark:text-zinc-550 uppercase tracking-widest">
+                  Or design your own
                 </span>
                 <div className="h-px bg-zinc-200/60 dark:bg-zinc-900 flex-1" />
               </div>
 
-              {/* Preset avatars list */}
-              <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-                {PRESET_AVATARS.map((url, idx) => {
-                  const isSelected = currentUser.avatarUrl === url;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => handleSelectPreset(url)}
-                      className={`relative aspect-square rounded-full overflow-hidden border-2 transition-all duration-200 outline-none ${
-                        isSelected 
-                          ? 'border-indigo-500 scale-105 shadow-md' 
-                          : 'border-zinc-200 dark:border-zinc-805 hover:border-indigo-500/40 hover:scale-102'
-                      }`}
-                    >
-                      <img 
-                        referrerPolicy="no-referrer"
-                        src={url} 
-                        alt={`Preset option ${idx + 1}`} 
-                        className="w-full h-full object-cover"
-                      />
-                      {isSelected && (
-                        <div className="absolute inset-0 bg-indigo-500/20 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-white drop-shadow-md stroke-[3px]" />
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Custom Image Address Input Form */}
-              <form onSubmit={handleSaveCustomAvatar} className="pt-3 border-t border-zinc-200/60 dark:border-zinc-900 flex flex-col sm:flex-row gap-2">
-                <div className="flex-1 relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                    <Link className="w-4 h-4" />
+              {/* Section 2: Doodle Generator */}
+              <div className="space-y-4 pt-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-bold">
+                    2. Type a seed word to generate a custom doodle
                   </span>
-                  <input
-                    type="url"
-                    value={avatarInput}
-                    onChange={(e) => setAvatarInput(e.target.value)}
-                    placeholder="Paste custom absolute web image address (e.g. Unsplash dynamic URL)"
-                    required
-                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900 text-zinc-850 dark:text-zinc-100 placeholder:text-zinc-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-mono"
-                  />
                 </div>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-indigo-550 hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-550 text-white font-bold uppercase tracking-wider text-[10px] rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer select-none"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                  Save Custom Picture
-                </button>
-              </form>
+                
+                <div className="flex flex-col sm:flex-row gap-4 items-center bg-zinc-50/50 dark:bg-zinc-900/40 p-4 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80">
+                  {/* Live preview */}
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-indigo-500/30 flex-shrink-0 bg-white flex items-center justify-center shadow-inner">
+                    <img
+                      src={`https://api.dicebear.com/7.x/open-peeps/svg?seed=${encodeURIComponent(customSeed.trim() || 'happy')}`}
+                      alt="Custom preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  
+                  <div className="flex-1 w-full space-y-2">
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
+                        <Sparkles className="w-4 h-4 text-indigo-500" />
+                      </span>
+                      <input
+                        type="text"
+                        value={customSeed}
+                        onChange={(e) => setCustomSeed(e.target.value)}
+                        placeholder="Type any word (e.g. your name, magic word, vibe...)"
+                        className="w-full pl-10 pr-3 py-2 text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-850 dark:text-zinc-100 placeholder:text-zinc-500 outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-mono"
+                      />
+                    </div>
+                    
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const generatedUrl = `https://api.dicebear.com/7.x/open-peeps/svg?seed=${encodeURIComponent(customSeed.trim() || 'happy')}`;
+                        handleSelectPreset(generatedUrl);
+                      }}
+                      className="w-full px-4 py-2 bg-indigo-550 hover:bg-indigo-650 dark:bg-indigo-600 dark:hover:bg-indigo-550 text-white font-bold uppercase tracking-wider text-[10px] rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer select-none"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      Apply Generated Doodle
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
