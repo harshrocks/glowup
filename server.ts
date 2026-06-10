@@ -753,7 +753,7 @@ app.post('/api/user/reset', authenticateToken, async (req: any, res) => {
 // ----------------------------------------------------
 // VITE AND STATIC WEB ASSETS MIDDLEWARE
 // ----------------------------------------------------
-if (!process.env.NETLIFY) {
+async function startStandaloneServer() {
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -772,6 +772,12 @@ if (!process.env.NETLIFY) {
   // Bind server port listeners
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 GlowUp 10 Applet Node Server listening on port ${PORT}`);
+  });
+}
+
+if (!process.env.NETLIFY) {
+  startStandaloneServer().catch((err) => {
+    console.error('⚠️ Failed to start standalone local server:', err);
   });
 }
 
