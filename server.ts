@@ -5,6 +5,9 @@ import pg from 'pg';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { createServer as createViteServer } from 'vite';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Dual-fallback handling for ESM paths
 const __filename = fileURLToPath(import.meta.url);
