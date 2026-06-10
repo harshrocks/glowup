@@ -200,7 +200,7 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
           onClick={onEnterApp}
           className={`flex items-center gap-1.5 px-4.5 py-2 rounded-xl font-bold uppercase tracking-wider text-xs transition-all shadow-md active:scale-95 cursor-pointer border ${
             scrolled
-              ? 'bg-indigo-600 hover:bg-indigo-750 border-indigo-650 text-white'
+              ? 'bg-indigo-600 hover:bg-indigo-700 border-indigo-600 text-white'
               : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
           }`}
         >
@@ -511,7 +511,7 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
             </div>
             <button
               onClick={onEnterApp}
-              className="px-6 py-3 rounded-2xl bg-indigo-650 hover:bg-indigo-700 text-white font-bold uppercase tracking-wider text-xs transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
+              className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold uppercase tracking-wider text-xs transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
             >
               Start the Challenge Now
             </button>

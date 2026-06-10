@@ -540,7 +540,7 @@ export default function SocialHub({
                     <span className="block text-xs font-bold text-rose-600 dark:text-rose-400">🔥 Send Flame Taunt</span>
                     <span className="block text-[10px] text-slate-400 mt-0.5">Ignite key competitive friction!</span>
                   </div>
-                  <Zap className="w-4 h-4 text-rose-550 group-hover:scale-110 transition-transform" />
+                  <Zap className="w-4 h-4 text-rose-500 group-hover:scale-110 transition-transform" />
                 </button>
               </div>
 

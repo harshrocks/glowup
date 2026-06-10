@@ -244,8 +244,8 @@ export default function ProfileAnalytics({
                 onClick={() => setIsEditingAvatar(!isEditingAvatar)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border cursor-pointer text-xs font-semibold uppercase tracking-wider font-mono select-none transition-all ${
                   isEditingAvatar 
-                    ? 'border-indigo-500/40 bg-indigo-500/10 text-indigo-550 dark:text-indigo-400' 
-                    : 'border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900'
+                    ? 'border-indigo-500/40 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' 
+                    : 'border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-350 hover:bg-zinc-100 dark:hover:bg-zinc-900'
                 }`}
               >
                 <Camera className="w-3.5 h-3.5" />
@@ -322,7 +322,7 @@ export default function ProfileAnalytics({
 
               <div className="flex items-center gap-2 pt-1">
                 <div className="h-px bg-zinc-200/60 dark:bg-zinc-900 flex-1" />
-                <span className="text-[9px] font-mono text-zinc-450 dark:text-zinc-550 uppercase tracking-widest">
+                <span className="text-[9px] font-mono text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">
                   Or design your own
                 </span>
                 <div className="h-px bg-zinc-200/60 dark:bg-zinc-900 flex-1" />
@@ -366,7 +366,7 @@ export default function ProfileAnalytics({
                         const generatedUrl = `https://api.dicebear.com/7.x/open-peeps/svg?seed=${encodeURIComponent(customSeed.trim() || 'happy')}`;
                         handleSelectPreset(generatedUrl);
                       }}
-                      className="w-full px-4 py-2 bg-indigo-550 hover:bg-indigo-650 dark:bg-indigo-600 dark:hover:bg-indigo-550 text-white font-bold uppercase tracking-wider text-[10px] rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-98 cursor-pointer select-none"
+                      className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white font-bold uppercase tracking-wider text-[10px] rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer select-none"
                     >
                       <Check className="w-3.5 h-3.5" />
                       Apply Generated Doodle
@@ -488,7 +488,7 @@ export default function ProfileAnalytics({
             {displayChartData.map(entry => (
               <div key={entry.name} className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
-                <span className="text-zinc-650 dark:text-zinc-300 font-medium truncate font-sans text-[11.5px]">
+                <span className="text-zinc-600 dark:text-zinc-300 font-medium truncate font-sans text-[11.5px]">
                   {entry.name}: <strong className="font-mono text-zinc-850 dark:text-zinc-200">{entry.value} pts</strong>
                 </span>
               </div>

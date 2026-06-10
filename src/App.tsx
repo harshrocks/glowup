@@ -816,7 +816,7 @@ export default function App() {
               onClick={() => { playCuteClick(); setActiveTab('dashboard'); }}
               className={`flex flex-col items-center gap-1.5 py-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
                 activeTab === 'dashboard'
-                  ? 'text-indigo-650 dark:text-indigo-400 scale-[1.03] bg-indigo-500/10 dark:bg-indigo-500/15 font-extrabold'
+                  ? 'text-indigo-600 dark:text-indigo-400 scale-[1.03] bg-indigo-500/10 dark:bg-indigo-500/15 font-extrabold'
                   : 'text-zinc-450 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium'
               }`}
             >
@@ -828,7 +828,7 @@ export default function App() {
               onClick={() => { playCuteClick(); setActiveTab('social'); }}
               className={`flex flex-col items-center gap-1.5 py-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
                 activeTab === 'social'
-                  ? 'text-indigo-650 dark:text-indigo-400 scale-[1.03] bg-indigo-500/10 dark:bg-indigo-500/15 font-extrabold'
+                  ? 'text-indigo-600 dark:text-indigo-400 scale-[1.03] bg-indigo-500/10 dark:bg-indigo-500/15 font-extrabold'
                   : 'text-zinc-450 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium'
               }`}
             >
@@ -840,7 +840,7 @@ export default function App() {
               onClick={() => { playCuteClick(); setActiveTab('analytics'); }}
               className={`flex flex-col items-center gap-1.5 py-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
                 activeTab === 'analytics'
-                  ? 'text-indigo-650 dark:text-indigo-400 scale-[1.03] bg-indigo-500/10 dark:bg-indigo-500/15 font-extrabold'
+                  ? 'text-indigo-600 dark:text-indigo-400 scale-[1.03] bg-indigo-500/10 dark:bg-indigo-500/15 font-extrabold'
                   : 'text-zinc-450 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium'
               }`}
             >
