@@ -598,7 +598,7 @@ export default function App() {
       id: Math.random().toString(),
       username: 'peer',
       displayName: selected,
-      avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+      avatarUrl: `https://api.dicebear.com/7.x/open-peeps/svg?seed=${selected}`,
       taskName: 'Nudge alert!',
       points: 0,
       timestamp: 'Just now',

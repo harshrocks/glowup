@@ -47,6 +47,7 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loadingLB, setLoadingLB] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
 
   const leaderboardRef = useRef<HTMLDivElement>(null);
 
@@ -171,15 +172,50 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors duration-300">
-      
+    <div 
+      onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 50)}
+      className="h-screen overflow-y-auto bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors duration-300 scroll-smooth"
+    >
+      {/* Sticky/Fixed Navigation Header */}
+      <header className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-10 py-4 transition-all duration-300 ${
+        scrolled 
+          ? 'bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-md border-b border-zinc-200/50 dark:border-zinc-800/50 shadow-xs' 
+          : 'bg-transparent border-b border-transparent'
+      }`}>
+        {/* Top-Left Brand Label */}
+        <div className="flex items-center gap-2 select-none">
+          <div className={`w-3.5 h-3.5 rounded-full blur-[1px] transition-colors duration-300 ${scrolled ? 'bg-indigo-500' : 'bg-white'}`}></div>
+          <span 
+            onClick={onEnterApp}
+            className={`text-sm font-black uppercase tracking-[0.25em] cursor-pointer hover:opacity-85 transition-colors duration-300 ${
+              scrolled ? 'text-zinc-900 dark:text-white' : 'text-white'
+            }`}
+          >
+            GLOWUP 10
+          </span>
+        </div>
+
+        {/* Top-Right Navigation Portal Button */}
+        <button
+          onClick={onEnterApp}
+          className={`flex items-center gap-1.5 px-4.5 py-2 rounded-xl font-bold uppercase tracking-wider text-xs transition-all shadow-md active:scale-95 cursor-pointer border ${
+            scrolled
+              ? 'bg-indigo-600 hover:bg-indigo-750 border-indigo-650 text-white'
+              : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
+          }`}
+        >
+          <LogIn className="w-3.5 h-3.5" />
+          Enter Challenge Console
+        </button>
+      </header>
+
       {/* 100vh Full Hero Carousel section */}
       <div 
         style={{ 
           backgroundColor: IMAGES[activeIndex].bg,
           fontFamily: 'Inter, sans-serif'
         }}
-        className="relative w-full h-screen overflow-hidden transition-colors duration-[650ms] cubic-bezier(0.4,0,0.2,1)"
+        className="relative w-full h-screen overflow-hidden transition-colors duration-[650ms] cubic-bezier(0.4,0,0.2,1) flex-shrink-0"
       >
         {/* Grain overlay */}
         <div 
@@ -190,26 +226,6 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
             backgroundRepeat: 'repeat'
           }}
         />
-
-        {/* Top-Left Brand Label */}
-        <div className="absolute top-6 left-6 sm:left-10 z-60 flex items-center gap-2 select-none">
-          <div className="w-3.5 h-3.5 bg-white rounded-full blur-[1px]"></div>
-          <span 
-            onClick={onEnterApp}
-            className="text-sm font-black uppercase tracking-[0.25em] text-white cursor-pointer hover:opacity-80 transition-opacity"
-          >
-            GLOWUP 10
-          </span>
-        </div>
-
-        {/* Top-Right Navigation Portal Button */}
-        <button
-          onClick={onEnterApp}
-          className="absolute top-5 right-6 sm:right-10 z-60 flex items-center gap-1.5 px-4.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold uppercase tracking-wider text-xs transition-all shadow-md active:scale-95 cursor-pointer"
-        >
-          <LogIn className="w-3.5 h-3.5" />
-          Enter Challenge Console
-        </button>
 
         {/* Giant Ghost Text */}
         <div className="absolute inset-x-0 top-[18%] flex items-center justify-center pointer-events-none select-none z-2">
@@ -307,7 +323,7 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
       {/* Main landing container: Live Scoreboard section */}
       <div 
         ref={leaderboardRef}
-        className="w-full bg-zinc-50 dark:bg-[#09090b] transition-colors py-12 px-4 sm:py-20 select-text"
+        className="w-full bg-zinc-50 dark:bg-[#09090b] transition-colors py-12 px-4 sm:py-20 pb-44 select-text"
       >
         <div className="max-w-6xl mx-auto space-y-12">
           

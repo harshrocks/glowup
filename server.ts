@@ -31,16 +31,16 @@ const memoryDatabase: {
   activities: any[];
 } = {
   users: [
-    { id: 101, username: 'alex_glow', display_name: 'Alex Rivers', avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', streak: 14, best_streak: 21, status_message: 'Deep into writing an essay today! ✍️', is_bot: true },
-    { id: 102, username: 'sarah_m', display_name: 'Sarah Miller', avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', streak: 9, best_streak: 9, status_message: 'Hit 10/10 today! Bedtime boundary next 😴', is_bot: true },
-    { id: 103, username: 'james_k', display_name: 'James Knight', avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', streak: 3, best_streak: 5, status_message: 'Struggling to stay off my phone 📱', is_bot: true },
-    { id: 104, username: 'emily_growth', display_name: 'Emily Chen', avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150', streak: 11, best_streak: 12, status_message: 'Cardio session completed! BDNF is flowing 🏃‍♀️', is_bot: true }
+    { id: 101, username: 'alex_glow', display_name: 'Alex Rivers', avatar_url: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=Alex', streak: 14, best_streak: 21, status_message: 'Deep into writing an essay today! ✍️', is_bot: true },
+    { id: 102, username: 'sarah_m', display_name: 'Sarah Miller', avatar_url: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=Sarah', streak: 9, best_streak: 9, status_message: 'Hit 10/10 today! Bedtime boundary next 😴', is_bot: true },
+    { id: 103, username: 'james_k', display_name: 'James Knight', avatar_url: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=James', streak: 3, best_streak: 5, status_message: 'Struggling to stay off my phone 📱', is_bot: true },
+    { id: 104, username: 'emily_growth', display_name: 'Emily Chen', avatar_url: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=Emily', streak: 11, best_streak: 12, status_message: 'Cardio session completed! BDNF is flowing 🏃‍♀️', is_bot: true }
   ],
   logs: [],
   activities: [
-    { id: 1, user_id: 102, username: 'sarah_m', display_name: 'Sarah Miller', avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', task_name: 'Reading', points: 2, type: 'log', timestamp: new Date(Date.now() - 25 * 60000).toISOString() },
-    { id: 2, user_id: 101, username: 'alex_glow', display_name: 'Alex Rivers', avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', task_name: 'Essays & Journaling', points: 2, type: 'log', timestamp: new Date(Date.now() - 60 * 60000).toISOString() },
-    { id: 3, user_id: 104, username: 'emily_growth', display_name: 'Emily Chen', avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150', task_name: 'Physical Activity', points: 1, type: 'log', timestamp: new Date(Date.now() - 120 * 60000).toISOString() }
+    { id: 1, user_id: 102, username: 'sarah_m', display_name: 'Sarah Miller', avatar_url: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=Sarah', task_name: 'Reading', points: 2, type: 'log', timestamp: new Date(Date.now() - 25 * 60000).toISOString() },
+    { id: 2, user_id: 101, username: 'alex_glow', display_name: 'Alex Rivers', avatar_url: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=Alex', task_name: 'Essays & Journaling', points: 2, type: 'log', timestamp: new Date(Date.now() - 60 * 60000).toISOString() },
+    { id: 3, user_id: 104, username: 'emily_growth', display_name: 'Emily Chen', avatar_url: 'https://api.dicebear.com/7.x/open-peeps/svg?seed=Emily', task_name: 'Physical Activity', points: 1, type: 'log', timestamp: new Date(Date.now() - 120 * 60000).toISOString() }
   ]
 };
 
@@ -91,7 +91,7 @@ async function bootstrapDatabase() {
           display_name VARCHAR(100) NOT NULL,
           email VARCHAR(100) UNIQUE NOT NULL,
           password_hash VARCHAR(255) NOT NULL,
-          avatar_url TEXT DEFAULT 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+          avatar_url TEXT DEFAULT 'https://api.dicebear.com/7.x/open-peeps/svg?seed=You',
           streak INT DEFAULT 0,
           best_streak INT DEFAULT 0,
           status_message VARCHAR(255) DEFAULT 'Ready to glow up!',
@@ -200,7 +200,7 @@ app.post('/api/auth/register', async (req, res) => {
 
   try {
     const passwordHash = await bcrypt.hash(password, 10);
-    const randAvatar = `https://images.unsplash.com/photo-${['1535713875002-d1d0cf377fde', '1570295999919-56ceb5ecca61', '1494790108377-be9c29b29330', '1507003211169-0a1dd7228f2d'][Math.floor(Math.random() * 4)]}?w=150`;
+    const randAvatar = `https://api.dicebear.com/7.x/open-peeps/svg?seed=${cleanUsername}`;
 
     if (useDatabaseFallback || !pool) {
       // Memory Store logic
