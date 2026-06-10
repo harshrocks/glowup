@@ -3,6 +3,9 @@
   publish = "dist"
   functions = "netlify/functions"
 
+[functions]
+  node_bundler = "esbuild"
+
 # Rewrite rule to proxy frontend API requests to the Netlify Serverless Function
 [[redirects]]
   from = "/api/*"
