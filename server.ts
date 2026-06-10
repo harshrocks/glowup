@@ -22,6 +22,14 @@ const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_
 
 app.use(express.json());
 
+// Rewrite Netlify Functions routing prefix to match local router paths
+app.use((req, res, next) => {
+  if (req.url.startsWith('/.netlify/functions/api')) {
+    req.url = req.url.replace('/.netlify/functions/api', '/api');
+  }
+  next();
+});
+
 // Initialize PostgreSQL Connection Pool with SSL requirements for Cloud/Neon
 let pool: pg.Pool | null = null;
 let useDatabaseFallback = false;
@@ -745,22 +753,26 @@ app.post('/api/user/reset', authenticateToken, async (req: any, res) => {
 // ----------------------------------------------------
 // VITE AND STATIC WEB ASSETS MIDDLEWARE
 // ----------------------------------------------------
-if (process.env.NODE_ENV !== 'production') {
-  const vite = await createViteServer({
-    server: { middlewareMode: true },
-    appType: 'spa',
-  });
-  app.use(vite.middlewares);
-} else {
-  const distPath = path.join(process.cwd(), 'dist');
-  app.use(express.static(distPath));
-  // Serve single index.html SPA for unmatched browser page requests
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
+if (!process.env.NETLIFY) {
+  if (process.env.NODE_ENV !== 'production') {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: 'spa',
+    });
+    app.use(vite.middlewares);
+  } else {
+    const distPath = path.join(process.cwd(), 'dist');
+    app.use(express.static(distPath));
+    // Serve single index.html SPA for unmatched browser page requests
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+  }
+
+  // Bind server port listeners
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 GlowUp 10 Applet Node Server listening on port ${PORT}`);
   });
 }
 
-// Bind server port listeners
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 GlowUp 10 Applet Node Server listening on port ${PORT}`);
-});
+export { app };
