@@ -1,0 +1,6 @@
+{
+  "name": "GlowUp 10",
+  "description": "A social productivity and habit-tracking app that gamifies hitting exactly 10 points daily through high-leverage intellectual, physical, and digital-minimalism tasks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
