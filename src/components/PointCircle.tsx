@@ -136,12 +136,12 @@ export default function PointCircle({ points, goal, streak }: PointCircleProps) 
             <div className="flex items-baseline justify-center">
               <span className={`text-5xl sm:text-6xl font-black leading-none tracking-tighter ${
                 isGlowCompleted 
-                  ? 'text-amber-550 dark:text-amber-500' 
+                  ? 'text-amber-500 dark:text-amber-500' 
                   : 'text-zinc-850 dark:text-zinc-50'
               }`}>
                 {points}
               </span>
-              <span className="text-zinc-400 dark:text-zinc-550 text-lg font-bold ml-1">
+              <span className="text-zinc-400 dark:text-zinc-500 text-lg font-bold ml-1">
                 /{goal}
               </span>
             </div>
