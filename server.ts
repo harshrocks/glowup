@@ -55,28 +55,35 @@ const memoryDatabase: {
   ]
 };
 
-try {
-  pool = new pg.Pool({
-    connectionString: DATABASE_URL,
-    ssl: DATABASE_URL.includes('sslmode=require') || DATABASE_URL.includes('neon.tech')
-      ? { rejectUnauthorized: false }
-      : undefined,
-    connectionTimeoutMillis: 5000,
-  });
+const isInvalidFallback = !DATABASE_URL || DATABASE_URL.includes('npg_@') || DATABASE_URL.includes('MY_DATABASE_URL');
 
-  // Test pool connection
-  pool.query('SELECT NOW()', (err) => {
-    if (err) {
-      console.warn('⚠️ PostgreSQL database connection failed. Falling back to in-memory persistence layer:', err.message);
-      useDatabaseFallback = true;
-    } else {
-      console.log('✅ Successfully connected to Neon PostgreSQL Database!');
-      bootstrapDatabase();
-    }
-  });
-} catch (error: any) {
-  console.warn('⚠️ Database driver error. Falling back to memory storage:', error.message);
+if (isInvalidFallback) {
+  console.warn('⚠️ No valid DATABASE_URL configured. Falling back to in-memory persistence layer immediately.');
   useDatabaseFallback = true;
+} else {
+  try {
+    pool = new pg.Pool({
+      connectionString: DATABASE_URL,
+      ssl: DATABASE_URL.includes('sslmode=require') || DATABASE_URL.includes('neon.tech')
+        ? { rejectUnauthorized: false }
+        : undefined,
+      connectionTimeoutMillis: 5000,
+    });
+
+    // Test pool connection
+    pool.query('SELECT NOW()', (err) => {
+      if (err) {
+        console.warn('⚠️ PostgreSQL database connection failed. Falling back to in-memory persistence layer:', err.message);
+        useDatabaseFallback = true;
+      } else {
+        console.log('✅ Successfully connected to Neon PostgreSQL Database!');
+        bootstrapDatabase();
+      }
+    });
+  } catch (error: any) {
+    console.warn('⚠️ Database driver error. Falling back to memory storage:', error.message);
+    useDatabaseFallback = true;
+  }
 }
 
 // Bootstrap PostgreSQL DB tables
@@ -86,14 +93,6 @@ async function bootstrapDatabase() {
   try {
     const client = await pool.connect();
     try {
-      // Alter column types to support unlimited Base64 image payload strings
-      try {
-        await client.query('ALTER TABLE users ALTER COLUMN avatar_url TYPE TEXT');
-        await client.query('ALTER TABLE activities ALTER COLUMN avatar_url TYPE TEXT');
-      } catch (colErr) {
-        console.log('Column alter completed or non-postgres environment:', colErr);
-      }
-
       // 1. Users Table
       await client.query(`
         CREATE TABLE IF NOT EXISTS users (
@@ -141,34 +140,43 @@ async function bootstrapDatabase() {
         )
       `);
 
-      // 4. Seed Standard Peer Bots for Leaderboard if they do not exist definitions
-      const bots = memoryDatabase.users;
-      for (const bot of bots) {
-        const checkRes = await client.query('SELECT id FROM users WHERE username = $1', [bot.username]);
-        if (checkRes.rowCount === 0) {
-          await client.query(
-            `INSERT INTO users (username, display_name, email, password_hash, avatar_url, streak, best_streak, status_message, is_bot)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)`,
-            [bot.username, bot.display_name, `${bot.username}@glowup10.com`, 'bot_secret_hashed', bot.avatar_url, bot.streak, bot.best_streak, bot.status_message]
-          );
-        }
-      }
-
-      // 5. Seed initial activity logs for bots if empty
-      const actCount = await client.query('SELECT COUNT(*) FROM activities');
-      if (parseInt(actCount.rows[0].count) === 0) {
-        for (const item of memoryDatabase.activities) {
-          // Find bot ID
-          const botIdRes = await client.query('SELECT id FROM users WHERE username = $1', [item.username]);
-          if (botIdRes.rowCount > 0) {
-            const bId = botIdRes.rows[0].id;
+      // 4. Seed Standard Peer Bots for Leaderboard if they do not exist (wrapped to isolate errors)
+      try {
+        const bots = memoryDatabase.users;
+        for (const bot of bots) {
+          const checkRes = await client.query('SELECT id FROM users WHERE username = $1', [bot.username]);
+          if (checkRes.rowCount === 0) {
             await client.query(
-              `INSERT INTO activities (user_id, username, display_name, avatar_url, task_name, points, type, timestamp)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, NOW() - INTERVAL '30 minutes')`,
-              [bId, item.username, item.display_name, item.avatar_url, item.task_name, item.points, item.type]
+              `INSERT INTO users (username, display_name, email, password_hash, avatar_url, streak, best_streak, status_message, is_bot)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)
+               ON CONFLICT (username) DO NOTHING`,
+              [bot.username, bot.display_name, `${bot.username}@glowup10.com`, 'bot_secret_hashed', bot.avatar_url, bot.streak, bot.best_streak, bot.status_message]
             );
           }
         }
+      } catch (botErr: any) {
+        console.warn('Note: Skiping bot seeding checks due to concurrent insertion:', botErr.message);
+      }
+
+      // 5. Seed initial activity logs for bots if empty (wrapped to isolate errors)
+      try {
+        const actCount = await client.query('SELECT COUNT(*) FROM activities');
+        if (parseInt(actCount.rows[0].count) === 0) {
+          for (const item of memoryDatabase.activities) {
+            // Find bot ID
+            const botIdRes = await client.query('SELECT id FROM users WHERE username = $1', [item.username]);
+            if (botIdRes.rowCount > 0) {
+              const bId = botIdRes.rows[0].id;
+              await client.query(
+                `INSERT INTO activities (user_id, username, display_name, avatar_url, task_name, points, type, timestamp)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, NOW() - INTERVAL '30 minutes')`,
+                [bId, item.username, item.display_name, item.avatar_url, item.task_name, item.points, item.type]
+              );
+            }
+          }
+        }
+      } catch (actErr: any) {
+        console.warn('Note: Skipping activity log seeding due to concurrent insertion:', actErr.message);
       }
 
     } finally {
