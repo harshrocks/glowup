@@ -15,12 +15,23 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_glowup_key_10';
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_fallback_secret_only';
 
 // Use the user's provided Neon database URL as fallback
 const DATABASE_URL = process.env.DATABASE_URL || '';
 
 app.use(express.json());
+
+// Enable CORS for Flutter app and Web
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Rewrite Netlify Functions routing prefix to match local router paths
 app.use((req, res, next) => {
@@ -55,7 +66,7 @@ const memoryDatabase: {
   ]
 };
 
-const isInvalidFallback = !DATABASE_URL || DATABASE_URL.includes('INVALID_CRED_@') || DATABASE_URL.includes('MY_DATABASE_URL');
+const isInvalidFallback = !DATABASE_URL || DATABASE_URL.includes('MY_DATABASE_URL');
 
 if (isInvalidFallback) {
   console.warn('⚠️ No valid DATABASE_URL configured. Falling back to in-memory persistence layer immediately.');
